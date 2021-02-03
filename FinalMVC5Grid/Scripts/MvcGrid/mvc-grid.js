@@ -83,8 +83,8 @@ var MvcGrid = (function () {
                 'not-equals': 'Not equals',
                 'earlier-than': 'Earlier than',
                 'later-than': 'Later than',
-                'earlier-than-or-equal': 'Earlier than or equal',
-                'later-than-or-equal': 'Later than or equal'
+                'earlier-than-or-equal': 'To',
+                'later-than-or-equal': 'From'
             },
             enum: {
                 'equals': 'Equals',
@@ -818,15 +818,14 @@ var MvcGridFilter = (function () {
 
         show: function () {
             var filter = this;
-
             filter.popup.render(filter);
-
             filter.bindOperator();
             filter.bindMethods();
             filter.bindValues();
             filter.bindActions();
-
+            debugger;     
             filter.popup.show(filter.column);
+            $('.mvc-grid-operator').hide();
         },
 
         render: function () {
@@ -915,13 +914,15 @@ var MvcGridFilter = (function () {
 
         bindOperator: function () {
             var filter = this.column.filter;
-            var operator = this.popup.element.querySelector('.mvc-grid-operator');
-
-            if (operator) {
-                operator.addEventListener('change', function () {
-                    filter.operator = this.value;
-                });
-            }
+            debugger;
+                  filter.operator = "and";
+          
+                var operator = this.popup.element.querySelector('.mvc-grid-operator');
+                if (operator) {
+                    operator.addEventListener('change', function () {
+                        filter.operator = this.value;
+                    });
+                }
         },
         bindMethods: function () {
             var filter = this.column.filter;

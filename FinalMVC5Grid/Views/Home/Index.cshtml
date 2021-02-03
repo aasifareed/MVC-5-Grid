@@ -9,7 +9,8 @@
     List<SelectListItem> selectListItems = new List<SelectListItem>();
     selectListItems = ViewBag.EmployeeStatusList;
 }
-<link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet" />
+
+<link href="~/Content/MvcGrid/mvc-grid.css" rel="stylesheet" />
 <br />
 <br />
 <br />
@@ -17,7 +18,10 @@
     .Grid(Model)
     .Build(columns =>
     {
-        columns.Add(model => model.Name).Titled("Name").Filterable(true).FilteredAs("custom");
+        columns.Add(model => model.Name).Titled("Name").Filterable(true).FilteredAs("text");
+        columns.Add(model => model.Email).Titled("Email Address").Filterable(true).FilteredAs("text");
+        columns.Add(model => model.DateOfBirth).Titled("Date of Birth").Formatted("{0:d}")
+        .Filterable(GridFilterType.Double).FilteredAs("date");
 
     })
     .Empty("No data found")
@@ -26,28 +30,52 @@
     .Pageable()
 )
 
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
 <script src="~/Scripts/MvcGrid/mvc-grid.js"></script>
 <script>
 
     var CustomTextFilter = (function (base) {
-    MvcGridExtends(CustomTextFilter, base);
+        MvcGridExtends(CustomTextFilter, base);
 
-    function CustomTextFilter(column) {
-        base.call(this, column);
+        function CustomTextFilter(column) {
+            base.call(this, column);
+            if (column.name == 'email') {
+                this.methods = ["contains"];
+                column.grid.lang.custom = { contains: 'Contains' };
+            } if (column.name == "name") {
+                this.methods = ["equals", "not-equals"];
+                column.grid.lang.custom = { equals: 'Equals', 'not-equals': 'Not equals' };
+            }
+        }
 
-        this.methods = ['contains'];
-        column.grid.lang.custom = { contains: 'Contains' };
-    }
+        return CustomTextFilter;
+    })(MvcGridFilter);
 
-    // Other extension points can be found at MvcGridFilter declaration
+    new MvcGrid(document.querySelector('.mvc-grid'), {
+        filters: {
+            'text': CustomTextFilter,
+        }
+    });
 
-    return CustomTextFilter;
-})(MvcGridFilter);
 
-new MvcGrid(document.querySelector('.mvc-grid'), {
-    filters: {
-        'custom': CustomTextFilter
-    }
-});
+    var CustomMvcGridDateFilter = (function (base) {
+        MvcGridExtends(MvcGridDateFilter, base);
+        function MvcGridDateFilter(column) {
+            base.call(this, column);
+            if (column.name == 'date-of-birth') {
+                this.methods = ["later-than-or-equal", "earlier-than-or-equal"];
+                column.grid.lang.custom = { 'later-than-or-equal': 'From', 'earlier-than-or-equal': 'To' };
+            }
+        }
+        return MvcGridDateFilter;
+    })(MvcGridFilter);
+
+    new MvcGrid(document.querySelector('.mvc-grid'), {
+        filters: {
+            'date': CustomMvcGridDateFilter,
+        }
+    });
+
+
 
 </script>
